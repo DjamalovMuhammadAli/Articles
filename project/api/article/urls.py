@@ -8,4 +8,5 @@ urlpatterns = [
     path('detail/<int:pk>', views.DetailDetailView.as_view(), name='detail_page'),
     path('edit-page', views.edit_page, name='edit_page'),
     path('update-page/<int:pk>', views.update_page, name='update_page'),
+    path('delete-page/<int:pk>', views.delete_page, name='delete_page'),
 ]   

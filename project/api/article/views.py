@@ -1,4 +1,5 @@
-from django.shortcuts import render
+from django.shortcuts import render, redirect
+from django.urls import reverse
 
 # My
 from article.models import Article
@@ -34,6 +35,7 @@ def edit_page(request):
   }
   return render(request, template, context)
 
+
 def update_page(request, pk):
 
   success_update = False
@@ -53,5 +55,10 @@ def update_page(request, pk):
     'form':ArticleForm(instance = get_article),
     'success_update':success_update
   }
-
   return render(request, template, context)
+
+
+def delete_page(request, pk):
+  get_article = Article.objects.get(pk=pk)
+  get_article.delete()
+  return redirect(reverse('edit_page'))

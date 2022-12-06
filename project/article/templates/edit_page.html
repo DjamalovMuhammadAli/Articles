@@ -1,9 +1,9 @@
 {% extends 'index.html' %}
 
 {% block content %}
-  <h1 class="mt-4">Edit ponel</h1>
+  <h1 class="mt-4">Admin ponel</h1>
 
-  <!-- Button trigger modal -->
+  {% comment %} <!-- Button trigger modal --> {% endcomment %}
   <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#exampleModal">
     Add new article
   </button>
@@ -31,7 +31,7 @@
           <th scope="col">Date of created</th>
           <th scope="col">name</th>
           <th scope="col">Redact</th>
-          <th scope="col">Delelt</th>
+          <th scope="col">Delete</th>
       </thead>
       <tbody>
         {% for i in list_articles %}
@@ -40,15 +40,14 @@
             <td>{{ i.created_date}}</td>
             <td>{{ i.name }}</td>
             <td><a href="{% url 'update_page' i.id %}">Redact</a></td>
-            <td><a href="">Delete</a></td>
+            <td><a href="{% url 'delete_page' i.id %}">Delete</a></td>
           </tr>
         {% endfor %}
       </tbody>
     </table>
   {% endif %}
 
-
-  <!-- Modal -->
+  {% comment %} <!-- Modal --> {% endcomment %}
   <div class="modal fade" id="exampleModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
     <div class="modal-dialog" role="document">
       <div class="modal-content">
