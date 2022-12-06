@@ -27,7 +27,7 @@
     {% for i in list_articles %}
       <ul class="list-group mt-4">
         <li class="list-group-item">
-          <b>{{ i.create_date }}</b>
+          <b>{{ i.created_date }}</b>
           <span class="m-2">{{ i.name }}</span>
           <span>{{ i.text|truncatechars:"5"}}</span>
           <span class="float-right m-3"><a href="/detail/{{ i.id }}">Go to article</a></span>

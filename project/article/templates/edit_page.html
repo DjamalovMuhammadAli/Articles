@@ -3,25 +3,73 @@
 {% block content %}
   <h1 class="mt-4">Edit ponel</h1>
 
-  <table class="table table-bordered">
-    <thead>
-      <tr>
-        <th scope="col">id</th>
-        <th scope="col">Date of created</th>
-        <th scope="col">name</th>
-        <th scope="col">Redact</th>
-        <th scope="col">Delelt</th>
-    </thead>
-    <tbody>
-      {% for i in list_articles %}
-      <tr>
-        <th>{{ i.id }}</th>
-        <td>{{ i.created_date}}</td>
-        <td>{{ i.name }}</td>
-        <td><a href="">Redact</a></td>
-        <td><a href="">Delete</a></td>
-      </tr>
-      {% endfor %}
-    </tbody>
-  </table>
+  <!-- Button trigger modal -->
+  <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#exampleModal">
+    Add new article
+  </button>
+
+  {% if success %}
+    <p style="color:red">Notation added</p>
+  {% endif %}
+
+  {% if update %}
+    {% if success_update %}
+      <p style="color:red">Notation updated</p>
+    {% endif %}
+    <p class="mt-4">Redacting page</p>
+    <p><a href="{% url 'edit_page' %}">Go back</a></p>
+    <form id="update_date" method="post">
+        {% csrf_token %}
+        {{ form }}
+      </form>
+      <button form="update_date" type="submit" class="btn btn-primary">Update</button>
+  {% else %}
+    <table class="table table-bordered mt-4">
+      <thead>
+        <tr>
+          <th scope="col">id</th>
+          <th scope="col">Date of created</th>
+          <th scope="col">name</th>
+          <th scope="col">Redact</th>
+          <th scope="col">Delelt</th>
+      </thead>
+      <tbody>
+        {% for i in list_articles %}
+          <tr>
+            <th>{{ i.id }}</th>
+            <td>{{ i.created_date}}</td>
+            <td>{{ i.name }}</td>
+            <td><a href="{% url 'update_page' i.id %}">Redact</a></td>
+            <td><a href="">Delete</a></td>
+          </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  {% endif %}
+
+
+  <!-- Modal -->
+  <div class="modal fade" id="exampleModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="exampleModalLabel">Modal title</h5>
+          <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+          </button>
+        </div>
+        <div class="modal-body">
+          <form id="add_form" method="post">
+            {% csrf_token %}
+            {{ form }}
+          </form>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+          <button form="add_form" type="submit" class="btn btn-primary">Add</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
 {% endblock content %}
