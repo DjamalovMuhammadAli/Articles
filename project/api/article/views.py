@@ -15,3 +15,11 @@ class DetailDetailView(DetailView):
   model = Article
   template_name = 'detail.html'
   context_object_name = 'get_article'
+
+
+def edit_page(request):
+  template = 'edit_page.html'
+  context = {
+    
+  }
+  return render(request, template, context)

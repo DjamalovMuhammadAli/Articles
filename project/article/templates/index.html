@@ -13,19 +13,15 @@
 
     <ul class="nav nav-pills">
       <li class="nav-item">
-        <a class="nav-link active" href="#">Active</a>
+        {% url 'home' as url_home %}
+        <a class="nav-link {% if url_home == request.path %} active {% endif %}" href="{{ url_home }}">Main</a>
       </li>
       <li class="nav-item">
-        <a class="nav-link">Link</a>
-      </li>
-      <li class="nav-item">
-        <a class="nav-link">Link</a>
-      </li>
-      <li class="nav-item">
-        <a class="nav-link" href="#" tabindex="-1" aria-disable="true">Disable</a>
+        {% url 'edit_page' as url_edit_page %}
+        <a class="nav-link" {% if url_edit_page == request.path %} active {% endif%} href="{{ url_edit_page }}">CRUD</a>
       </li>
     </ul>
-
+    {% block content %}
     <h1 class="mt-4">Articles</h1>
 
     {% for i in list_articles %}
@@ -38,6 +34,7 @@
         </li>
       </ul>
     {% endfor %}
+    {% endblock content %}
   </div>
 </body>
 </html>
