@@ -7,4 +7,5 @@ class Article(models.Model):
   text = models.TextField()
 
   def __str__(self):
-    return '%s:.%s-%s'%(self.created_date, self.name, self.text) 
+    return self.name 
+    # return '%s: %s-%s'%(self.created_date, self.name, self.text) 
