@@ -20,6 +20,6 @@ class DetailDetailView(DetailView):
 def edit_page(request):
   template = 'edit_page.html'
   context = {
-    
+    'list_articles': Article.objects.all().order_by('-id')
   }
   return render(request, template, context)

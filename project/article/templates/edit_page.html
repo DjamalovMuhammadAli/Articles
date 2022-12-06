@@ -1,5 +1,27 @@
 {% extends 'index.html' %}
 
 {% block content %}
-  <h1 class="mt-4">CRUD ponel</h1>
+  <h1 class="mt-4">Edit ponel</h1>
+
+  <table class="table table-bordered">
+    <thead>
+      <tr>
+        <th scope="col">id</th>
+        <th scope="col">Date of created</th>
+        <th scope="col">name</th>
+        <th scope="col">Redact</th>
+        <th scope="col">Delelt</th>
+    </thead>
+    <tbody>
+      {% for i in list_articles %}
+      <tr>
+        <th>{{ i.id }}</th>
+        <td>{{ i.created_date}}</td>
+        <td>{{ i.name }}</td>
+        <td><a href="">Redact</a></td>
+        <td><a href="">Delete</a></td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
 {% endblock content %}
