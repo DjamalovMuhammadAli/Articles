@@ -10,9 +10,9 @@
   <!--Verbindung zu CSS Datei-->
   <link rel="stylesheet" href="css/meineCSSDatei.css">
   <!-- add icon link in title-->
-  <link rel="icon"
+  {% comment %} <link rel="icon"
       href="https://cdn0.iconfinder.com/data/icons/st-patrick-s-day-basic-lineal-color-1/512/13_Calendar-512.png"
-      type="image/x-icon">
+      type="image/x-icon"> {% endcomment %}
 </head>
 <body>
   <div class="container mt-4">
@@ -25,6 +25,15 @@
       <li class="nav-item">
         {% url 'edit_page' as url_edit_page %}
         <a class="nav-link" {% if url_edit_page == request.path %} active {% endif%} href="{{ url_edit_page }}">CRUD</a>
+      </li>
+      <li class="nav-item">
+        <a class="nav-link"href="">Avtorization</a>
+      </li>
+      <li class="nav-item">
+        <a class="nav-link"href="">Registration</a>
+      </li>
+      <li class="nav-item">
+        <a class="nav-link btn-danger ml-5"href="">LogOut</a>
       </li>
     </ul>
     {% block content %}

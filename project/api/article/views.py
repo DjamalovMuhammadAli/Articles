@@ -1,6 +1,7 @@
 from django.shortcuts import render, redirect
 from django.urls import reverse, reverse_lazy
 from django.contrib import messages
+from django.contrib.auth.views import LoginView
 
 # My
 from article.models import Article
@@ -51,6 +52,11 @@ class ArticleUpdateView(CustomSuccessMessageMixin, UpdateView):
   def get_context_data(self, **kwargs):
     kwargs['update'] = True
     return super().get_context_data(**kwargs) 
+
+
+class MyprojectLoginView(LoginView):
+  template_class = AuthUserForm
+  success_url = reverse_lazy('edit_page')
 
 
 class ArticleDeleteView(DeleteView):
