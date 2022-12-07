@@ -1,63 +1,136 @@
-from django.shortcuts import render, redirect
+from django.shortcuts import render,redirect,HttpResponse
+from django.views.generic import ListView, DetailView,CreateView, UpdateView,DeleteView
+from django.views.generic.edit import FormMixin
 from django.urls import reverse, reverse_lazy
 from django.contrib import messages
-from django.contrib.auth.views import LoginView
+from django.contrib.auth.views import LoginView,LogoutView
 from django.contrib.auth.models import User
+from django.contrib.auth import authenticate, login
+from django.contrib.auth.mixins import LoginRequiredMixin
+from django.http import HttpResponseRedirect
+from django.template import Context, Template
 
 # My
-from article.models import Article
-from django.views.generic import ListView, DetailView, CreateView, UpdateView, DeleteView
-from article.forms import ArticleForm, AuthUserForm, RegisterUserForm
+from article.forms import ArticleForm, AuthUserForm, RegisterUserForm, CommentForm
+from article.models import Article, Comments
 
 
-class ArticleListView(ListView):
+class HomeListView(ListView):
   model = Article
   template_name = 'index.html'
   context_object_name = 'list_articles'
 
 
-class ArticleDetailView(DetailView):
-  model = Article
-  template_name = 'detail.html'
-  context_object_name = 'get_article'
+# class LoginRequiredMixin(AccessMixin):
+#   """Verify that the current user is authenticated."""
+#   def dispatch(self, request, *args, **kwargs):
+#     if not request.user.is_authenticated:
+#       return self.handle_no_permission()
+#     return super().dispatch(request, *args, **kwargs)
 
 
 class CustomSuccessMessageMixin:
   @property
+
   def success_msg(self):
-    return False
-  def form_valid(self, form):
+    return False  
+
+  def form_valid(self,form):
     messages.success(self.request, self.success_msg)
     return super().form_valid(form)
+
   def get_success_url(self):
     return '%s?id=%s' % (self.success_url, self.object.id)
 
 
-class ArticleCreateView(CustomSuccessMessageMixin, CreateView):
+class HomeDetailView(CustomSuccessMessageMixin, FormMixin, DetailView):
+  model = Article
+  template_name = 'detail.html'
+  context_object_name = 'get_article'
+  form_class = CommentForm
+  success_msg = 'Comment successfully created, wait for migration!'
+
+  def get_success_url(self):
+    return reverse_lazy('detail_page', kwargs={'pk':self.get_object().id})
+
+  def post(self,request, *args, **kwargs):
+    form = self.get_form()
+    if form.is_valid():
+      return self.form_valid(form)
+    else:
+      return self.form_invalid(form)
+  
+  def form_valid(self,form):
+    self.object = form.save(commit=False)
+    self.object.article = self.get_object()
+    self.object.author = self.request.user
+    self.object.save()
+    return super().form_valid(form)
+
+def update_comment_status(request, pk, type):
+  item = Comments.objects.get(pk=pk)
+  if request.user != item.article.author:
+    return HttpResponse('deny')
+  if type == 'public':
+    import operator
+    item.status = operator.not_(item.status)
+    item.save()
+    template = 'comment_item.html'
+    context = {'item':item, 'status_comment':'Comment aploaded'}
+    return render(request, template, context)
+  elif type == 'delete':
+    item.delete()
+    return HttpResponse('''
+    <div class="alert alert-success">
+    Comment deleted
+    </div>
+    ''')
+  return HttpResponse('1')
+
+
+
+class ArticleCreateView(LoginRequiredMixin, CustomSuccessMessageMixin, CreateView):
+  login_url = reverse_lazy('login_page')
   model = Article
   template_name = 'edit_page.html'
   form_class = ArticleForm
   success_url = reverse_lazy('edit_page')
-  success_msg = 'Notetion created'
-  def get_context_data(self, **kwargs):
+  success_msg = 'Notation created'
+
+  def get_context_data(self,**kwargs):
     kwargs['list_articles'] = Article.objects.all().order_by('-id')
     return super().get_context_data(**kwargs)
 
+  def form_valid(self,form):
+    self.object = form.save(commit=False)
+    self.object.author = self.request.user
+    self.object.save()
+    return super().form_valid(form)
+    
 
-class ArticleUpdateView(CustomSuccessMessageMixin, UpdateView):
+class ArticleUpdateView(LoginRequiredMixin, CustomSuccessMessageMixin,UpdateView):
   model = Article
   template_name = 'edit_page.html'
   form_class = ArticleForm
   success_url = reverse_lazy('edit_page')
-  success_msg = 'Notetion successful updated'
-  def get_context_data(self, **kwargs):
+  success_msg = 'Запись успешно обновлена'
+  def get_context_data(self,**kwargs):
     kwargs['update'] = True
-    return super().get_context_data(**kwargs) 
+    return super().get_context_data(**kwargs)
+  def get_form_kwargs(self):
+    kwargs = super().get_form_kwargs()
+    if self.request.user != kwargs['instance'].author:
+      return self.handle_no_permission()
+    return kwargs
 
 
 class MyprojectLoginView(LoginView):
-  template_class = AuthUserForm
+  template_name = 'login.html'
+  form_class = AuthUserForm
   success_url = reverse_lazy('edit_page')
+
+  def get_success_url(self):
+    return self.success_url
 
 
 class RegisterUserView(CreateView):
@@ -65,69 +138,35 @@ class RegisterUserView(CreateView):
   template_name = 'register_page.html'
   form_class = RegisterUserForm
   success_url = reverse_lazy('edit_page')
-  success_msg = 'User successfully created'
+  success_msg = 'User successful created'
+
+  def form_valid(self,form):
+    form_valid = super().form_valid(form)
+    username = form.cleaned_data["username"]
+    password = form.cleaned_data["password"]
+    aut_user = authenticate(username=username,password=password)
+    login(self.request, aut_user)
+    return form_valid
 
 
-class ArticleDeleteView(DeleteView):
-  mode = Article
+class MyProjectLogout(LogoutView):
+    next_page = reverse_lazy('edit_page')
+
+
+class ArticleDeleteView(LoginRequiredMixin, DeleteView):
+  model = Article
   template_name = 'edit_page.html'
   success_url = reverse_lazy('edit_page')
-  success_msg = 'Notetion deleted'
-  def post(self, request, *args, **kwargs):
+  success_msg = 'Atetion deleted'
+
+  def post(self,request,*args,**kwargs):
     messages.success(self.request, self.success_msg)
     return super().post(request)
 
-
-
-
-
-
-
-
-
-
-
-
-
-# def delete_page(request, pk):
-#   get_article = Article.objects.get(pk=pk)
-#   get_article.delete()
-#   return redirect(reverse('edit_page'))
-
-
-# def update_page(request, pk):
-
-#   success_update = False
-
-#   get_article = Article.objects.get(pk=pk)
-
-#   if request.method == 'POST':
-#     form = ArticleForm(request.POST, instance = get_article)
-#     if form.is_valid():
-#       form.save()
-#       success_update = True
-  
-#   template = 'edit_page.html'
-#   context = {
-#     'get_article': get_article,
-#     'update':True,
-#     'form':ArticleForm(instance = get_article),
-#     'success_update':success_update
-#   }
-#   return render(request, template, context)
-
-
-# def edit_page(request):
-#   success = False
-#   if request.method == 'POST':
-#     form = ArticleForm(request.POST)
-#     if form.is_valid():
-#       form.save()
-#       success = True
-#   template = 'edit_page.html'
-#   context = {
-#     'list_articles': Article.objects.all().order_by('-id'),
-#     'form': ArticleForm(),
-#     'success': success
-#   }
-#   return render(request, template, context)
+  def delete(self, request, *args, **kwargs):
+    self.object = self.get_object()
+    if self.request.user != self.object.author:
+      return self.handle_no_permission()
+    success_url = self.get_success_url()
+    self.object.delete()
+    return HttpResponseRedirect(success_url)
