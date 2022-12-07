@@ -27,10 +27,12 @@
         <a class="nav-link" {% if url_edit_page == request.path %} active {% endif%} href="{{ url_edit_page }}">CRUD</a>
       </li>
       <li class="nav-item">
-        <a class="nav-link"href="">Avtorization</a>
+        {% url 'login_page' as url_login_page %}
+        <a class="nav-link" {% if url_login_page == request.path %} active {% endif%} href="{{ url_login_page }}">Avtorization</a>
       </li>
       <li class="nav-item">
-        <a class="nav-link"href="">Registration</a>
+        {% url 'register_page' as url_register_page %}
+        <a class="nav-link" {% if url_register_page == request.path %} active {% endif%} href="{{ url_register_page }}">Registration</a>
       </li>
       <li class="nav-item">
         <a class="nav-link btn-danger ml-5"href="">LogOut</a>

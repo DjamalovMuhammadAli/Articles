@@ -2,11 +2,12 @@ from django.shortcuts import render, redirect
 from django.urls import reverse, reverse_lazy
 from django.contrib import messages
 from django.contrib.auth.views import LoginView
+from django.contrib.auth.models import User
 
 # My
 from article.models import Article
 from django.views.generic import ListView, DetailView, CreateView, UpdateView, DeleteView
-from article.forms import ArticleForm
+from article.forms import ArticleForm, AuthUserForm, RegisterUserForm
 
 
 class ArticleListView(ListView):
@@ -57,6 +58,14 @@ class ArticleUpdateView(CustomSuccessMessageMixin, UpdateView):
 class MyprojectLoginView(LoginView):
   template_class = AuthUserForm
   success_url = reverse_lazy('edit_page')
+
+
+class RegisterUserView(CreateView):
+  model = User
+  template_name = 'register_page.html'
+  form_class = RegisterUserForm
+  success_url = reverse_lazy('edit_page')
+  success_msg = 'User successfully created'
 
 
 class ArticleDeleteView(DeleteView):
