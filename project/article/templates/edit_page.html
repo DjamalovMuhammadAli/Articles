@@ -12,6 +12,14 @@
     <p style="color:red">Notation added</p>
   {% endif %}
 
+  {% if messages %}
+    <div class="alert alert-success">
+      {% for m in messages %}
+        {{ m }}
+      {% endfor %}
+    </div>
+  {% endif %}
+
   {% if update %}
     {% if success_update %}
       <p style="color:red">Notation updated</p>
@@ -39,8 +47,18 @@
             <th>{{ i.id }}</th>
             <td>{{ i.created_date}}</td>
             <td>{{ i.name }}</td>
-            <td><a href="{% url 'update_page' i.id %}">Redact</a></td>
-            <td><a href="{% url 'delete_page' i.id %}">Delete</a></td>
+            <td><a href="{% url 'update_page' i.id %}">redact</a></td>
+            <td>
+              <form id="delete_page" action="{% url 'delete_page' i.id %}" method="post">{% csrf_token %}</form>
+              <a href="javascript:void()" onclick="delete_question()">delete</a>
+              <script>
+                function delete_question() {
+                  if (confirm("Are you sure")){
+                    document.getElementById('delete_form').submit()
+                  }
+                }
+              </script>
+            </td>
           </tr>
         {% endfor %}
       </tbody>
