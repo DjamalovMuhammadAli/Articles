@@ -43,7 +43,7 @@
       </thead>
       <tbody>
         {% for i in list_articles %}
-          <tr>
+          <tr {% if i.id|slugify == request.GET.id %} style="background:lightgreen"{% endif %}>
             <th>{{ i.id }}</th>
             <td>{{ i.created_date}}</td>
             <td>{{ i.name }}</td>

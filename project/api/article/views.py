@@ -24,10 +24,11 @@ class CustomSuccessMessageMixin:
   @property
   def success_msg(self):
     return False
-
   def form_valid(self, form):
     messages.success(self.request, self.success_msg)
     return super().form_valid(form)
+  def get_success_url(self):
+    return '%s?id=%s' % (self.success_url, self.object.id)
 
 
 class ArticleCreateView(CustomSuccessMessageMixin, CreateView):
@@ -41,11 +42,12 @@ class ArticleCreateView(CustomSuccessMessageMixin, CreateView):
     return super().get_context_data(**kwargs)
 
 
-class ArticleUpdateView(UpdateView):
+class ArticleUpdateView(CustomSuccessMessageMixin, UpdateView):
   model = Article
   template_name = 'edit_page.html'
   form_class = ArticleForm
   success_url = reverse_lazy('edit_page')
+  success_msg = 'Notetion successful updated'
   def get_context_data(self, **kwargs):
     kwargs['update'] = True
     return super().get_context_data(**kwargs) 
@@ -55,6 +57,21 @@ class ArticleDeleteView(DeleteView):
   mode = Article
   template_name = 'edit_page.html'
   success_url = reverse_lazy('edit_page')
+  success_msg = 'Notetion deleted'
+  def post(self, request, *args, **kwargs):
+    messages.success(self.request, self.success_msg)
+    return super().post(request)
+
+
+
+
+
+
+
+
+
+
+
 
 
 # def delete_page(request, pk):
