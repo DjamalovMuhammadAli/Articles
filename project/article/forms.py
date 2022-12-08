@@ -43,9 +43,6 @@ class RegisterUserForm(forms.ModelForm):
     return user
         
         
-        
-        
-        
 class CommentForm(forms.ModelForm):
   class Meta:
     model = Comments

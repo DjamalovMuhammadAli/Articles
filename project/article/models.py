@@ -7,6 +7,7 @@ from .middleware import get_current_user
 
 
 class Article(models.Model):
+  author = models.ForeignKey(User, on_delete=models.CASCADE, verbose_name='Owner of article', blank=True, null=True)
   created_date = models.DateTimeField(auto_now=True)
   name = models.CharField(max_length=200)
   text = models.TextField()
@@ -26,5 +27,5 @@ class Comments(models.Model):
   author = models.ForeignKey(User, on_delete = models.CASCADE, blank = True, null = True )
   create_date = models.DateTimeField(auto_now=True)
   text = models.TextField()
-  status = models.BooleanField(default=False)
+  status = models.BooleanField(default=False) 
   objects  = StatusFilterComments()
